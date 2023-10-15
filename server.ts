@@ -13,6 +13,8 @@ export function app(): express.Express {
   const distFolder = join(process.cwd(), 'dist/angular-test/browser');
   const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
 
+  const isrPages: Array<{ route: string, cachePage: any }> = [];
+
   // Our Universal express-engine (found @ https://github.com/angular/universal/tree/main/modules/express-engine)
   server.engine('html', ngExpressEngine({
     bootstrap: AppServerModule
@@ -30,7 +32,24 @@ export function app(): express.Express {
 
   // All regular routes use the Universal engine
   server.get('*', (req, res) => {
-    res.render(indexHtml, { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] });
+    // console.log("req.url", req.url);
+    // console.log(isrPages);
+
+    const foundCache = isrPages.find(item => item.route == req.url);
+
+    if (foundCache) {
+      console.log("cache html");
+      res.send(foundCache.cachePage);
+    } else {
+      res.render(indexHtml, { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] }, (err, html) => {
+        console.log("not cache html");
+        isrPages.push({
+          'route': req.url,
+          'cachePage': html
+        });
+        res.send(html);
+      });
+    }
   });
 
   return server;
