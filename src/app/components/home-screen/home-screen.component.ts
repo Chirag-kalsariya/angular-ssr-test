@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { Meta, MetaDefinition } from '@angular/platform-browser';
 
 @Component({
@@ -12,13 +13,17 @@ export class HomeScreenComponent {
   metaTagDesc: string = '';
 
   constructor(
-    private meta: Meta
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private meta: Meta,
   ) {
 
   }
 
   ngOnInit() {
-    this.getMetaTag();
+    const isServer = !isPlatformBrowser(this.platformId);
+    if (!isServer) {
+      this.getMetaTag();
+    }
   }
 
   getMetaTag() {
@@ -30,6 +35,7 @@ export class HomeScreenComponent {
   }
 
   setMetaTag() {
+    console.log("Hello again");
     const metaData: MetaDefinition[] = [
       { name: 'description', content: this.metaTagTitle },
       { property: 'og:title', content: this.metaTagDesc },
