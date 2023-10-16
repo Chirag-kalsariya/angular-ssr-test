@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,5 +21,6 @@ import { HomeScreenWrapperComponent } from './components/home-screen-wrapper/hom
     AppRoutingModule
   ],
   bootstrap: [AppComponent],
+  providers: [provideClientHydration()]
 })
 export class AppModule { }
