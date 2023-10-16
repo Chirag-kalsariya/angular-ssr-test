@@ -42,11 +42,11 @@ export function app(): express.Express {
       const foundCache = isrPages.find(item => item.route == req.url);
 
       if (foundCache) {
-        console.log("cache html");
+        // console.log("cache html");
         res.send(foundCache.cachePage);
       } else {
         res.render(indexHtml, { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] }, (err, html) => {
-          console.log("not cache html");
+          // console.log("not cache html");
           isrPages.push({
             'route': req.url,
             'cachePage': html
@@ -55,7 +55,7 @@ export function app(): express.Express {
         });
       }
     } else {
-      console.log("bypass cache html");
+      // console.log("bypass cache html");
       res.render(indexHtml, { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] });
     }
   });
