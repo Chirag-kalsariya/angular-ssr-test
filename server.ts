@@ -6,6 +6,7 @@ import * as express from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { AppServerModule } from './src/main.server';
+import { environment } from './src/environments/environment';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -34,21 +35,28 @@ export function app(): express.Express {
   server.get('*', (req, res) => {
     // console.log("req.url", req.url);
     // console.log(isrPages);
+    // console.log(environment.ISR);
 
-    const foundCache = isrPages.find(item => item.route == req.url);
+    if (environment.ISR) {
 
-    if (foundCache) {
-      console.log("cache html");
-      res.send(foundCache.cachePage);
-    } else {
-      res.render(indexHtml, { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] }, (err, html) => {
-        console.log("not cache html");
-        isrPages.push({
-          'route': req.url,
-          'cachePage': html
+      const foundCache = isrPages.find(item => item.route == req.url);
+
+      if (foundCache) {
+        console.log("cache html");
+        res.send(foundCache.cachePage);
+      } else {
+        res.render(indexHtml, { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] }, (err, html) => {
+          console.log("not cache html");
+          isrPages.push({
+            'route': req.url,
+            'cachePage': html
+          });
+          res.send(html);
         });
-        res.send(html);
-      });
+      }
+    } else {
+      console.log("bypass cache html");
+      res.render(indexHtml, { req, providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }] });
     }
   });
 
